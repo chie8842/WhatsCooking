@@ -1,0 +1,7 @@
+{
+    "app_id": "whatscooking-sjsxs",
+    "config_version": 20210101,
+    "name": "whatscooking",
+    "provider_region": "aws-ap-southeast-1",
+    "deployment_model": "LOCAL"
+}
