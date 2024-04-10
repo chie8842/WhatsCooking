@@ -77,12 +77,13 @@ exports = async function(payload, response) {
       const results = await collection.aggregate(calledAggregation).toArray();
 
       response.setStatusCode(200)
-      response.setBody = JSON.stringify({'aggString': aggString, 'restaurants': results, 'restaurantsConut': results.length, 'searchStage': searchStageString, 'limitStage': limitStageString, 'projectStage': projectStageString, 'ok': true})
+      response.setBody = JSON.stringify({aggString: aggString, restaurants: results, restaurantsConut: results.length, searchStage: searchStageString, limitStage: limitStageString, projectStage: projectStageString, ok: true})
       response.setHeader(
         "Content-Type",
         "application/json"
       );
-      
+      console.log(response.setBody)
+
       return {
         aggString:aggString,
         restaurants: results,
