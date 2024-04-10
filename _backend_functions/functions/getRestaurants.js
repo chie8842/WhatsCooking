@@ -180,7 +180,7 @@ function buildSearchStage(searchTerm, food, foodArray, pathArray, operator, dist
   console.log("SEARCH STAGE", JSON.stringify(searchStage));
   return searchStage;
     
-};
+}
 
  // HELPER FUNCTION TO SEE IF OBJECTS ARE EMPTY
 function isEmpty(obj){
@@ -189,7 +189,7 @@ function isEmpty(obj){
       return false;
   }
   return true;
-};
+}
 
 function buildProjectStage(arg){
   console.log("IN BUILDPROJECTSTAGE FUNCTION")
