@@ -132,8 +132,8 @@ function buildSearchStage(searchTerm, food, foodArray, pathArray, operator, dist
     };    // END FUNCTION STAGE*******************
   } 
  
-  let returnedObjectFromBuildMust = context.functions.execute("buildCompoundMust", searchTerm, food, foodArray, operator, distance);
-  filterArray = context.functions.execute("buildCompoundFilter", stars, cuisine, borough);
+  let returnedObjectFromBuildMust = buildCompoundMust(searchTerm, food, foodArray, operator, distance);
+  filterArray = buildCompoundFilter(stars, cuisine, borough);
 
   mustArray = returnedObjectFromBuildMust.mustArray;
   console.log("BACK IN BUILD SEARCH STAGE!!");
@@ -216,4 +216,193 @@ function buildProjectStage(arg){
           }
       };
   return projectStage;
+}
+
+function buildCompoundMust(searchTerm, food, foodArray, operator, distance){
+   
+   console.log("IN BUILDCOMPOUNDMUST FUNCTION");
+    let searchObject = {};
+    
+    let geoObject = {}; // for geospatial Search options
+    let textObject ={}; // for main search box - restaurant names
+    let synObject = {}; // for 2nd search box - food items
+    
+    let mustArray =[];
+  
+    let ObjectCounter = 0;  // will use to see if I need a compound operator
+    let UseCompoundMustOperator = false;
+    
+     if (searchTerm){
+        ObjectCounter++;
+      textObject = {
+          text:{
+            query:searchTerm,
+            path: "name",
+            fuzzy:{
+              maxEdits:2
+            }
+          }
+        };
+        
+        searchObject = textObject
+    }
+    
+    if (food){
+      console.log("FOODARRAY", foodArray);
+      ObjectCounter++;
+      console.log("MENU IN PATH - SEARCH FOR SYNONYMS");
+      if (foodArray.length < 2){
+        console.log("FOOD", food);
+        synObject = {
+          text:{
+            query:food,
+            path: "menu",
+            synonyms: "MenuSynonyms"
+          }
+        };
+      } else { // foodArray.length>2
+        //console.log("FOODARRAY", foodArray);
+         synObject = {
+          text:{
+            query:foodArray,
+            path: "menu",
+            synonyms: "MenuSynonyms"
+          }
+        };
+      }
+      searchObject = synObject;
+    }
+    
+    
+        if (operator !== 'text'){      // operator is either 'near' or 'geoWithin' - GEOJSON SEARCH
+             ObjectCounter++;
+              if (operator === 'near'){
+           geoObject = {
+              "near":{
+                  "origin":{
+                      "type":"Point",
+                      "coordinates": [ -73.98474, 40.76289 ],
+                  },
+                  "pivot":1609,
+                  path: "location" 
+              }
+           };
+         }
+         else if (operator ==='geoWithin') {     // OPERATOR IS 'GEOWITHIN'
+          geoObject ={ 
+              geoWithin:{
+                circle:{
+                  center:{
+                    type:"Point",
+                    coordinates:[-73.98474, 40.76289]
+                    },
+                    radius:distance
+                  },
+                  path:"location"
+              }
+           };
+          }
+  
+          searchObject = geoObject;
+      }		// ---------------------------------------------------FOUND GEOOBJECT 
+      
+          console.log("OBJECT COUNTER", ObjectCounter);
+          console.log("FROM BUILDMUST SEARCHOBJECT: ", JSON.stringify(searchObject));
+  
+  // 	// TEST IF NEED COMPOUND OPERATOR-------------------------------------------------------
+  // 	if (ObjectCounter > 1) {      
+  // 		UseCompoundMustOperator = true;
+      
+        if (!isEmpty(textObject)){
+          mustArray.push(textObject);
+        }
+        
+        if (!isEmpty(synObject)) {
+          mustArray.push(synObject);
+        }
+        
+        if(!isEmpty(geoObject)){
+          mustArray.push(geoObject);
+        }
+             // NOW I HAVE FINISHED BUILDING compound.must
+              console.log("MUST ARRAY", JSON.stringify(mustArray));
+      
+    // }
+     
+     console.log("MUSTARRAY from buildmust function", JSON.stringify(mustArray));
+     
+     return {
+       mustArray: mustArray,
+       searchObject: searchObject,
+       textObject: textObject,
+       synObject: synObject,
+       geoObject: geoObject
+     };
+  
+   
+  }
+
+function buildCompoundFilter(stars, cuisine, borough){
+    console.log("IN BUILDCOMPOUNDFILTER FUNCTION");
+    
+    
+    let UseCompoundFilterOperator = false;
+    
+     let starsObject ={};
+     let cuisineObject ={};
+     let boroughObject={};
+     
+     let filterArray=[];    // this array is what I will build and return
+     
+     if (stars>1){
+          UseCompoundFilterOperator= true;		// because using filter
+  
+             starsObject ={
+              range:{
+                gte:stars,
+                path:"stars"
+              }
+          };
+            console.log("STARS OBJECT: " + stars);
+        }
+  
+        if (cuisine && cuisine.length !==0){
+            UseCompoundFilterOperator= true;		// because using filter
+          cuisineObject = {
+              text:{
+                query:cuisine,
+                path: "cuisine"
+              }
+          };
+      }    
+      
+      if (borough){
+          UseCompoundFilterOperator= true;		// because using filter
+            boroughObject ={
+              text:{
+                query:borough,
+                path:"borough"
+              }
+            };
+      }
+  
+      if (UseCompoundFilterOperator){
+          if (!isEmpty(starsObject)){
+            filterArray.push(starsObject);
+          }
+            if (!isEmpty(cuisineObject)) {
+            filterArray.push(cuisineObject);
+          }
+          
+          if(!isEmpty(boroughObject)){
+            filterArray.push(boroughObject);
+          }
+          
+      }  
+        
+        console.log("FILTER ARRAY RETURNED FROM BUILDCOMPOUNDFILTER", JSON.stringify(filterArray));
+        
+    
+    return filterArray;
+   
 }
