@@ -178,6 +178,20 @@ exports = async function(payload, response) {
       searchMetaStage
     ]).toArray();
     
+    response.setStatusCode(200)
+    response.setBody = JSON.stringify(
+        {
+          results:results,
+          searchMetaStageString: searchMetaStageString,
+          searchMetaStage:searchMetaStage,
+          ok:true
+        }
+    )
+    response.setHeader(
+        "Content-Type",
+        "application/json"
+    );
+    console.log(response.setBody)
     return {
       results:results,
       searchMetaStageString: searchMetaStageString,
