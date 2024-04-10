@@ -72,8 +72,7 @@ exports = async function(payload, response) {
       let searchStageString = JSON.stringify(searchStage);
       let limitStageString = JSON.stringify(limitStage);
       let projectStageString = JSON.stringify(projectStage);
-     
-     
+      
       const results = await collection.aggregate(calledAggregation).toArray();
 
       response.setStatusCode(200)
