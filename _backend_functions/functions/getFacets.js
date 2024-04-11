@@ -3,7 +3,7 @@ exports = async function(payload, response) {
   console.log("IN GETFACETS POST REQUEST");
   
     // Querying a mongodb collection:
-    const collection = context.services.get("mongodb-atlas").db("whatscooking").collection("restaurants");
+    const collection = context.services.get("mongodb-atlas").db("whatscooking").collection("restaurants_japanese");
     
     if (!payload.body) {
     return({

@@ -2,7 +2,7 @@ exports = async function(payload){
    
   let restname = payload.query.restname;
  
-  const collection = context.services.get("mongodb-atlas").db("whatscooking").collection("restaurants");
+  const collection = context.services.get("mongodb-atlas").db("whatscooking").collection("restaurants_japanese");
   
   //aggregation array
   let calledAggregation = [
